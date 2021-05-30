@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Attendance Checker</title>
+    </head>
+    <body>
+        <form name="infoForm">
+            <h1>Attendance Checker</h1>
+
+            <div id="courseInfoDiv">
+                <label> Course Name </label><br>
+                <input type="text" id="courseName" name="courseName" value="Default course name" readonly><br>
+                <label for="courseToken"> Course Token </label><br>
+                <input type="text" id="courseToken" name="courseToken" value="Saved Course Token"><br>
+            </div>
+
+            <div id="userInfoDiv">
+                <label> User Name </label><br>
+                <input type="text" id="userName" name="userName" value="Default user name" readonly><br>
+                <label for="userToken" > User Token </label><br>
+                <input type="text" id="userToken" name="userToken" value="Saved User Token"><br>
+            </div>
+
+            <button id="updateButton">Update</button>
+
+        </form>
+    </body>
+    <script src="../js/popup.js"></script>
+</html>
