@@ -1,7 +1,11 @@
 import smtplib
+import configparser
 from email.message import EmailMessage
 from datetime import date
-def mail(sender,receiver,course_name,random_token):
+def mail(receiver,course_name,random_token):
+    config = configparser.ConfigParser()
+    config.read('config')
+    sender = config['Mail']['sender']
     textfile = "test.txt"
     today = date.today()
     # Open the plain text file whose name is in textfile for reading.
@@ -17,6 +21,6 @@ def mail(sender,receiver,course_name,random_token):
     msg['To'] = receiver
 
     # Send the message via our own SMTP server.
-    s = smtplib.SMTP('localhost')
+    s = smtplib.SMTP(config['Mail']['server'])
     s.send_message(msg)
     s.quit()
