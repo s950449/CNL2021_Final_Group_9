@@ -3,13 +3,19 @@ from flask import Flask,request, render_template,jsonify
 import requests
 import configparser
 import os
+#from DB import DB
+class server:
+    def __init__(self,configPath='config'):
+        self.config = configparser.ConfigParser()
+        self.config.read(configPath)
+        self.mail = mail(configPath)
 app = Flask(__name__)
 @app.route('/',methods=['GET','POST'])
 def home():
     if request.method == 'POST':
         print(request.values)
     return "test"
-@app.route('/check',methods=['POST','GET'])
+@app.route('/checkConnection',methods=['POST','GET'])
 def check():
     #student = request.values['random_token']
     if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
@@ -17,18 +23,19 @@ def check():
     else:
         src_ip = jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR']}), 200
     print(src_ip)     
-    return "You are online"   
+    return "You are online"
+#@app.route('/addCourse',methods=['POST'])
+#def addCourse(course_name,lecturer_email,student_form):
+#@app.route('/startCourse',methods=['POST'])
+#def startCourse(masterToken,courseID,link):
+
 if __name__ == '__main__':
     from sys import argv
-    config = configparser.ConfigParser()
-    config.read('config')
-    course_name = "Testing"
-    random_token = "random"
-    receiver="b07902125@csie.ntu.edu.tw"
+    my_server = server()
+    my_server.mail.testMail()
     pid = os.fork()
     if pid > 0:
         print("Initialize Web Server")
         app.run(host='0.0.0.0',port=8000)
     else:
         print("Initialize Mail Server")
-        mail(receiver,course_name,random_token)

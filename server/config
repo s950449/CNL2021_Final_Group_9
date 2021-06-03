@@ -1,0 +1,12 @@
+[Server]
+server=localhost
+
+[Mail]
+server=localhost
+sender=b07902125@csie.ntu.edu.tw
+admin = b07902125@csie.ntu.edu.tw
+
+[SQL]
+server = localhost
+
+
