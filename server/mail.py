@@ -16,7 +16,6 @@ class mail:
         msg['To'] = self.admin
         msg.set_content("This is a test mail.")
         self.smtp.send_message(msg)
-        self.smtp.quit()
     def startCourse(self,receiver,course_name,random_token):
         textfile = "test.txt"
         today = date.today()
@@ -31,7 +30,20 @@ class mail:
         msg['Subject'] = f'{course_name} Meeting Link {today}'
         msg['From'] = self.sender
         msg['To'] = receiver
-
         # Send the message via our own SMTP server.
         self.smtp.send_message(msg)
-        self.smtp.quit()
+    def newCourse(self,receiver,courseID,course_name,masterToken):
+        msg = EmailMessage()
+        msg['Subject'] = f'Course {course_name} Successfully Added'
+        msg['From'] = self.sender
+        msg['To'] = receiver
+        msg.set_content(f"""\
+        Course Name:{course_name}
+        Course ID:{courseID}
+        Master Token:{masterToken}
+
+        DO NOT REPLY THIS MAIL
+        """)
+        self.smtp.send_message(msg)      
+
+
