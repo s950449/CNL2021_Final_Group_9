@@ -1,0 +1,14 @@
+[Server]
+server=localhost
+upload_directory=./upload_tmp
+
+[Mail]
+server=localhost
+sender=b07902125@csie.ntu.edu.tw
+admin = b07902125@csie.ntu.edu.tw
+
+[SQL]
+host = localhost
+password = root
+user = root
+
