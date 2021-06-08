@@ -3,7 +3,7 @@ export function mainTabAlert(msg){
   chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
     chrome.scripting.executeScript({
         target: {tabId: tabs[0].id},
-        files: ['alert.js'],
+        files: ['js/alert.js'],
     });
   });
 }
@@ -14,7 +14,7 @@ export function mainTabConfirm(msg){
 	chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
 		chrome.scripting.executeScript({
 	    	target: {tabId: tabs[0].id},
-	    	files: ['confirm.js'],
+	    	files: ['js/confirm.js'],
 		});
 
 		chrome.extension.sendMessage({greeting: "confirm?"}, function(response) {
@@ -22,4 +22,12 @@ export function mainTabConfirm(msg){
 		});
 	});
 	return ret;
+}
+export function allFilled(formid){
+  let allAreFilled = true;
+  document.getElementById(formid).querySelectorAll("[required]").forEach(function(i) {
+    if (!allAreFilled) return;
+    if (!i.value) allAreFilled = false;
+  })
+  return allAreFilled;
 }
