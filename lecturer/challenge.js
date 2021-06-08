@@ -2,7 +2,6 @@ import { sendServer } from './server.js';
 var challengeBotton = document.getElementById('challenge');
 challengeBotton.onclick = function () {
     submit();
-    location.reload();
 };
 
 async function challenge_submit() {
@@ -23,6 +22,7 @@ async function challenge_submit() {
     let responseMsg = sendServer(formData, "challenge");
     if (responseMsg.code == 0) {
         alert("challenge success");
+        window.history.back();
     }
     else {
         alert("challenge failed, please try again");
