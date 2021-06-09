@@ -6,7 +6,7 @@ import requests
 import configparser
 import os
 import uuid
-#from DB import DB
+from DB import DB
 class server:
     def __init__(self,configPath=os.path.join('config')):
         self.config = configparser.ConfigParser()
@@ -15,8 +15,8 @@ class server:
         self.mail = mail(configPath)
         self.debugMsg = "Debug\n"
         self.app.config['UPLOAD_FOLDER'] = self.config['Server']['upload_directory']
-        #self.db = DB()
-        #self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
+        self.db = DB()
+        self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         @self.app.route('/',methods=['GET','POST'])
         def home():
             if request.method == 'POST':
@@ -26,9 +26,9 @@ class server:
         def check():
         #student = request.values['random_token']
             if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-                src_ip = jsonify({'ip': request.environ['REMOTE_ADDR']}), 200
+                src_ip = request.environ['REMOTE_ADDR']
             else:
-                src_ip = jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR']}), 200
+                src_ip = request.environ['HTTP_X_FORWARDED_FOR']
             studentToken = request.values['studentToken']
             courseID = request.values['courseID']
             print(studentToken,courseID)
