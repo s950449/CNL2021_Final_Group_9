@@ -9,6 +9,10 @@ class mail:
         self.admin = self.config['Mail']['admin']
         self.sender = self.config['Mail']['sender']
         self.smtp = smtplib.SMTP(self.config['Mail']['server'])
+        self.password = self.config['Mail']['pass']
+        self.smtp.ehlo()
+        self.smtp.starttls()
+        self.smtp.login(self.sender,self.password)
     def testMail(self):
         msg = EmailMessage()
         msg['Subject'] = "Test Mail"
