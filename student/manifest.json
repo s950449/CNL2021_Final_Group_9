@@ -10,7 +10,12 @@
         "tabs",
         "storage",
         "scripting",
-        "background"
+        "background",
+        "alarms"
+    ],
+    "host_permissions": [
+        "*://*/",
+        "*://*/*/"
     ],
     "action": {
         "default_popup": "/html/popup.html",
