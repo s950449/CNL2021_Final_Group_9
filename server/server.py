@@ -15,7 +15,7 @@ class server:
         self.mail = mail(configPath)
         self.debugMsg = "Debug\n"
         self.app.config['UPLOAD_FOLDER'] = self.config['Server']['upload_directory']
-        self.db = DB()
+        self.db = DB(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         @self.app.route('/',methods=['GET','POST'])
         def home():
@@ -42,7 +42,7 @@ class server:
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         @self.app.route('/startCourse',methods=['POST'])
-        def addCourse():
+        def startCourse():
             masterToken = request.values['masterToken']
             courseID = request.values['courseID']
             link = request.values['link']
@@ -50,16 +50,16 @@ class server:
             mailList = self.db.startCourse(masterToken)         
             return "Add Course"
         @self.app.route('/addCourse',methods=['POST'])
-        def newCourse():
+        def addCourse():
             student_form = request.files['student_form']
             course_name = request.values['course_name']
             lecturer_email = request.values['lecturer_email']
             filename = secure_filename(student_form.filename)
             filepath = os.path.join(self.app.config['UPLOAD_FOLDER'],filename)
             student_form.save(filepath)
-            courseID=uuid.uuid4()
-            #masterToken = DB.addCourse(self.db_cursor,courseID,course_name,filepath)
-            masterToken = uuid.uuid4()
+            courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
+            if self.db.addStudents(courseID,masterToken,filepath) == False:
+                return "Error"
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
             return "New Course"  
         @self.app.route("/endCourse",methods=["POST"])
