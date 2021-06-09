@@ -8,7 +8,7 @@ import os
 import uuid
 #from DB import DB
 class server:
-    def __init__(self,configPath='config'):
+    def __init__(self,configPath=os.path.join('config')):
         self.config = configparser.ConfigParser()
         self.config.read(configPath)
         self.app = Flask(__name__)
