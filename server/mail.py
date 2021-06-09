@@ -20,18 +20,23 @@ class mail:
         msg['To'] = self.admin
         msg.set_content("This is a test mail.")
         self.smtp.send_message(msg)
-    def startCourse(self,receiver,course_name,random_token):
-        textfile = "test.txt"
+    def startCourse(self,receiver,meetingLink,courseID,random_token):
+    #    textfile = "test.txt"
         today = date.today()
         # Open the plain text file whose name is in textfile for reading.
-        with open(textfile) as fp:
+     #   with open(textfile) as fp:
             # Create a text/plain message
-            msg = EmailMessage()
-            msg.set_content(fp.read())
+      #      msg = EmailMessage()
+       #     msg.set_content(fp.read())
+        msg = EmailMessage()
+        msg.set_content(f"""\
+        Meeting Link: {meetingLink}?courseID={courseID}&userToken={random_token}
 
+        DO NOT REPLY THIS MAIL
+        """)
         # me == the sender's email address
         # you == the recipient's email address
-        msg['Subject'] = f'{course_name} Meeting Link {today}'
+        msg['Subject'] = f'Meeting Link {today}'
         msg['From'] = self.sender
         msg['To'] = receiver
         # Send the message via our own SMTP server.

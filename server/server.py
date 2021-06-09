@@ -47,7 +47,10 @@ class server:
             courseID = request.values['courseID']
             link = request.values['link']
             print(masterToken,courseID,link)
-            mailList = self.db.startCourse(masterToken)         
+            mailList = self.db.startCourse(masterToken)
+            for email,randomToken in mailList:
+                    self.mail.startCourse(email,link,courseID,randomToken)
+                    print(email,randomToken)      
             return "Add Course"
         @self.app.route('/addCourse',methods=['POST'])
         def addCourse():
