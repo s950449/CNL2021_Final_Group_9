@@ -19,7 +19,8 @@ class DB:
 			)
 		self.cursor = self.ServerDB.cursor()
 		self.cursor.execute("set global local_infile=1")
-		sql = "CREATE DATABASE %s"
+		# create database
+		sql = "CREATE DATABASE IF NOT EXISTS %s"
 		na = (self.dbName, )
 		sql = sql % na
 		self.cursor.execute(sql)
@@ -29,17 +30,22 @@ class DB:
 		sql = sql % na
 		self.cursor.execute(sql)
 		self.ServerDB.commit()
-		self.cursor.execute("CREATE TABLE Courses ("
-							+"CourseName varchar(20) NOT NULL,"
-							+"CourseID varchar(64) NOT NULL,"
-							+"Prof_Name varchar(20) NOT NULL,"
-							+"Prof_Email varchar(64) NOT NULL,"
-							+"Prof_masterToken varchar(64) NOT NULL,"
-							+"meeting_link varchar(200),"
-							+"UNIQUE (Prof_masterToken),"
-							+"PRIMARY KEY (CourseID)"
-							+")")
-		self.ServerDB.commit()
+		# create table Courses
+		sql = "show tables like \"Courses\""
+		self.cursor.execute(sql)
+		result = self.cursor.fetchall()
+		if len(result)==0:
+			self.cursor.execute("CREATE TABLE Courses ("
+								+"CourseName varchar(20) NOT NULL,"
+								+"CourseID varchar(64) NOT NULL,"
+								+"Prof_Name varchar(20) NOT NULL,"
+								+"Prof_Email varchar(64) NOT NULL,"
+								+"Prof_masterToken varchar(64) NOT NULL,"
+								+"meeting_link varchar(200),"
+								+"UNIQUE (Prof_masterToken),"
+								+"PRIMARY KEY (CourseID)"
+								+")")
+			self.ServerDB.commit()
 
 	def __del__(self):
 		self.ServerDB.close()
@@ -56,11 +62,16 @@ class DB:
 			host = self.host,
 			user = self.username,
 			password = self.password,
-			allow_local_infile = True,
-			database = self.dbName
+			allow_local_infile = True
 			)
 		self.cursor = self.ServerDB.cursor()
 		self.cursor.execute("set global local_infile=1")
+		self.ServerDB.commit()
+		# create database
+		sql = "CREATE DATABASE IF NOT EXISTS %s"
+		na = (self.dbName, )
+		sql = sql % na
+		self.cursor.execute(sql)
 		self.ServerDB.commit()
 		sql = "use %s"
 		na = (self.dbName, )
@@ -128,7 +139,7 @@ class DB:
 		# creat table Attendance_CourseID
 		sql = "CREATE TABLE Attendance_%s ("\
 			+"StuID varchar(10) NOT NULL,"\
-			+"Call_Time varchar(10) NOT NULL,"\
+			+"Call_Time varchar(64) NOT NULL,"\
 			+"Success boolean NOT NULL,"\
 			+"ChallengeID varchar(20) NOT NULL,"\
 			+"PRIMARY KEY (StuID, Call_Time)"\
@@ -169,7 +180,6 @@ class DB:
 	def startCourse(self, masterToken):
 		sql = "select CourseID from Courses where Prof_masterToken = \"%s\""
 		na = (masterToken, )
-		print(sql % masterToken)
 		sql = sql % na
 		self.cursor.execute(sql)
 		CourseID = self.cursor.fetchall()
@@ -213,9 +223,8 @@ class DB:
 			return -1
 		StuID = "".join(list(StuID[0]))
 		sql = "insert into Attendance_%s values (\"%s\",\"%s\",%s,\"%s\")"
-		na = (CourseID, StuID, timestamp, Success, ChallengeID)
+		na = (CourseID, StuID, str(timestamp), Success, ChallengeID)
 		sql = sql % na
-		print(sql)
 		self.cursor.execute(sql)
 		self.ServerDB.commit()
 		return True
@@ -287,11 +296,8 @@ class DB:
 	# get roll call result and out put the result to a file
 	# return file path
 	def getStudent(self, CourseID, masterToken, date=""):
+		cwd = os.getcwd()
 		if date=="":
-			cwd = os.getcwd()
-			# sql = "select StuID \"student id\", count(if(Success=1,1,NULL)) \"success\", \
-			# count(if(Success=0,1,NULL)) \"fail\" from Attendance_%s group by StuID into outfile \
-			# \"%s\" fields TERMINATED by \',\' enclosed by \'\"\' lines TERMINATED by \'\n\'"
 			sql = "select StuID , count(if(Success=1,1,NULL)) , count(if(Success=0,1,NULL)) \
 			 from Attendance_%s group by StuID"
 			na = (CourseID, )
@@ -307,8 +313,24 @@ class DB:
 				for data in result:
 					writer.writerow(list(data))
 			return filename
-		else: 
-			return
+		else:
+			sql = "select StuID , count(if(Success=1,1,NULL)) ,"\
+				+ "count(if(Success=0,1,NULL)) from Attendance_%s"\
+				+ " where Call_Time like \"%s"
+			na = (CourseID, date, )
+			sql = sql % na
+			sql = sql + "%" + "\" group by StuID"
+			self.cursor.execute(sql)
+			result = self.cursor.fetchall()
+			print(result)
+			now = datetime.now()
+			print(now)
+			filename = cwd+"/"+str(now)+".csv"
+			with open(filename,"w", newline="") as csvfile:
+				writer = csv.writer(csvfile)
+				for data in result:
+					writer.writerow(list(data))
+			return filename
 
 	# return all CourseNames and CourseIDs owned by the Email's owner
 	def getMyCourse(self, Email):
