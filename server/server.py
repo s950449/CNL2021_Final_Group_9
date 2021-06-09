@@ -1,4 +1,3 @@
-from mail import mail
 from flask import Flask, json,request, render_template,jsonify,g
 from flask.views import View
 from werkzeug.utils import secure_filename
@@ -6,17 +5,18 @@ import requests
 import configparser
 import os
 import uuid
-#from DB import DB
+from mail import mail
+from DB.DB import DB
 class server:
-    def __init__(self,configPath=os.path.join('config')):
+    def __init__(self,configPath=os.path.join('server/config')):
         self.config = configparser.ConfigParser()
         self.config.read(configPath)
         self.app = Flask(__name__)
         self.mail = mail(configPath)
         self.debugMsg = "Debug\n"
         self.app.config['UPLOAD_FOLDER'] = self.config['Server']['upload_directory']
-        #self.db = DB()
-        #self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
+        self.db = DB()
+        self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         @self.app.route('/',methods=['GET','POST'])
         def home():
             if request.method == 'POST':
@@ -26,9 +26,9 @@ class server:
         def check():
         #student = request.values['random_token']
             if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
-                src_ip = jsonify({'ip': request.environ['REMOTE_ADDR']}), 200
+                src_ip = request.environ['REMOTE_ADDR']
             else:
-                src_ip = jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR']}), 200
+                src_ip = request.environ['HTTP_X_FORWARDED_FOR']
             studentToken = request.values['studentToken']
             courseID = request.values['courseID']
             print(studentToken,courseID)
@@ -46,7 +46,8 @@ class server:
             masterToken = request.values['masterToken']
             courseID = request.values['courseID']
             link = request.values['link']
-            print(masterToken,courseID,link)          
+            print(masterToken,courseID,link)
+            mailList = self.db.startCourse(masterToken)         
             return "Add Course"
         @self.app.route('/addCourse',methods=['POST'])
         def newCourse():
@@ -60,7 +61,20 @@ class server:
             #masterToken = DB.addCourse(self.db_cursor,courseID,course_name,filepath)
             masterToken = uuid.uuid4()
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
-            return "New Course"                              
+            return "New Course"  
+        @self.app.route("/endCourse",methods=["POST"])
+        def endCourse():
+            masterToken = request.values["masterToken"]
+            courseID = request.values["courseID"]
+            return "End Course"
+        @self.app.route("/challenge",methods=["POST"])                            
+        def challenge():
+            masterToken = request.values["masterToken"]
+            courseID = request.values["courseID"]
+            challengeType = request.values["type"]        
+            challengeTarget = request.values["target"]
+            challengeTime = request.values["time"]
+            return "Done"
 if __name__ == '__main__':
     from sys import argv
     my_server = server()

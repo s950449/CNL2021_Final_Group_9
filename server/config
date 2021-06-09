@@ -3,10 +3,10 @@ server=localhost
 upload_directory=./upload_tmp
 
 [Mail]
-server=localhost
-sender=b07902125@csie.ntu.edu.tw
+server= smtp.gmail.com:587
+sender= b07902125@csie.ntu.edu.tw
 admin = b07902125@csie.ntu.edu.tw
-
+pass = <YOUR_PASS>
 [SQL]
 host = localhost
 password = root
