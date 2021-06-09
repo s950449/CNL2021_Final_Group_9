@@ -1,3 +1,4 @@
+# pip install mysql-connector-python
 import mysql.connector
 import csv
 from uuid import uuid4
@@ -14,11 +15,30 @@ class DB:
 			host = self.host,
 			user = self.username,
 			password = self.password,
-			allow_local_infile = True,
-			database = self.dbName
+			allow_local_infile = True
 			)
 		self.cursor = self.ServerDB.cursor()
 		self.cursor.execute("set global local_infile=1")
+		sql = "CREATE DATABASE %s"
+		na = (self.dbName, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		sql = "use %s"
+		na = (self.dbName, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		self.cursor.execute("CREATE TABLE Courses ("
+							+"CourseName varchar(20) NOT NULL,"
+							+"CourseID varchar(64) NOT NULL,"
+							+"Prof_Name varchar(20) NOT NULL,"
+							+"Prof_Email varchar(64) NOT NULL,"
+							+"Prof_masterToken varchar(64) NOT NULL,"
+							+"meeting_link varchar(200),"
+							+"UNIQUE (Prof_masterToken),"
+							+"PRIMARY KEY (CourseID)"
+							+")")
 		self.ServerDB.commit()
 
 	def __del__(self):
@@ -42,6 +62,12 @@ class DB:
 		self.cursor = self.ServerDB.cursor()
 		self.cursor.execute("set global local_infile=1")
 		self.ServerDB.commit()
+		sql = "use %s"
+		na = (self.dbName, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+
 	# check the variable is unique or not
 	# return True if it is unique
 	def isUnique(self, AttributeName, TableName, clauseName, clauseValue):
@@ -58,25 +84,29 @@ class DB:
 	# Add new Course to table Courses and creat table stu_CourseID and Attendance_CourseID
 	# return masterToken if success
 	# return -1 if CourseID is not unique
-	def addCourse(self, CourseName, CourseID, Prof_Name, Prof_Email, meeting_link=""):
+	def addCourse(self, CourseName, Prof_Name, Prof_Email, meeting_link=""):
 		# check CourseID is unique or not
-		if self.isUnique("CourseID","Courses","CourseID",CourseID)==False :
-			return -1
+		CourseID = str(uuid4()).replace("-", "_")
+		while True:
+			if self.isUnique("CourseID","Courses","CourseID",CourseID)==False :
+				CourseID = str(uuid4()).replace("-", "_")
+			else:
+				break
 
 		# create masterToken and check masterToken is unique or not
-		masterToken = uuid4()
+		masterToken = str(uuid4())
 		while True:
 			if self.isUnique("Prof_masterToken","Courses","Prof_masterToken",masterToken)==False :
-				masterToken = uuid4()
+				masterToken = str(uuid4())
 			else :
 				break
 		
 		# Add new Course to table Courses
 		sql = "INSERT INTO Courses VALUES (\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",\"%s\")"
-		na = (CourseName, CourseID, Prof_Name, Prof_Email, masterToken, meeting_link, )
-		print(sql % na)
+		na = (CourseName, str(CourseID), Prof_Name, Prof_Email, masterToken, meeting_link, )
+		# print(sql % na)
 		sql = sql % na
-		print(sql)
+		# print(sql)
 		self.cursor.execute(sql)
 		self.ServerDB.commit()
 
@@ -107,7 +137,7 @@ class DB:
 		sql = sql % na
 		self.cursor.execute(sql)
 		self.ServerDB.commit()
-		return str(masterToken)
+		return (CourseID, masterToken)
 
 	# add Students to specific Course
 	# return True when success
@@ -279,6 +309,38 @@ class DB:
 			return filename
 		else: 
 			return
+
+	# return all CourseNames and CourseIDs owned by the Email's owner
+	def getMyCourse(self, Email):
+		sql = "select CourseName, CourseID from Courses where Prof_Email=\"%s\""
+		na = (Email, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result = self.cursor.fetchall()
+		return result
+
+	# update new masterToken
+	def newMasterToken(self, CourseID):
+		sql = "select * from Courses where CourseID=\"%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result = self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		# create masterToken and check masterToken is unique or not
+		masterToken = uuid4()
+		while True:
+			if self.isUnique("Prof_masterToken","Courses","Prof_masterToken",masterToken)==False :
+				masterToken = uuid4()
+			else :
+				break
+		sql = "update Courses set Prof_masterToken=\"%s\" where CourseID=\"%s\""
+		na = (masterToken, CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		return masterToken
 
 
 
