@@ -1,5 +1,5 @@
 from mail import mail
-from flask import Flask,request, render_template,jsonify,g
+from flask import Flask, json,request, render_template,jsonify,g
 from flask.views import View
 from werkzeug.utils import secure_filename
 import requests
@@ -22,24 +22,33 @@ class server:
             if request.method == 'POST':
                 print(request.values)
             return "test"
-        @self.app.route('/checkConnection',methods=['POST','GET'])
+        @self.app.route('/checkChallenge',methods=['POST','GET'])
         def check():
         #student = request.values['random_token']
             if request.environ.get('HTTP_X_FORWARDED_FOR') is None:
                 src_ip = jsonify({'ip': request.environ['REMOTE_ADDR']}), 200
             else:
                 src_ip = jsonify({'ip': request.environ['HTTP_X_FORWARDED_FOR']}), 200
+            studentToken = request.values['studentToken']
+            courseID = request.values['courseID']
+            print(studentToken,courseID)
             print(src_ip)   
             print(self.debugMsg)
-            return "You are online"
-        @self.app.route('/addCourse',methods=['POST'])
+            response = jsonify(
+                hasChallenge = 0,
+                type = 0,
+                timeout = 60
+            )
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+        @self.app.route('/startCourse',methods=['POST'])
         def addCourse():
             masterToken = request.values['masterToken']
             courseID = request.values['courseID']
             link = request.values['link']
-            print(masterToken,courseID,link)
+            print(masterToken,courseID,link)          
             return "Add Course"
-        @self.app.route('/newCourse',methods=['POST'])
+        @self.app.route('/addCourse',methods=['POST'])
         def newCourse():
             student_form = request.files['student_form']
             course_name = request.values['course_name']
@@ -51,7 +60,7 @@ class server:
             #masterToken = DB.addCourse(self.db_cursor,courseID,course_name,filepath)
             masterToken = uuid.uuid4()
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
-            return "New Course"                    
+            return "New Course"                              
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
