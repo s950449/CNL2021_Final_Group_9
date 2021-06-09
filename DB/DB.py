@@ -317,6 +317,8 @@ class DB:
 		sql = sql % na
 		self.cursor.execute(sql)
 		result = self.cursor.fetchall()
+		if len(result)==0:
+			return -1
 		return result
 
 	# update new masterToken
