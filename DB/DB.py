@@ -295,6 +295,7 @@ class DB:
 
 	# get roll call result and out put the result to a file
 	# return file path
+	# file data stuid,success count,fail count
 	def getStudent(self, CourseID, masterToken, date=""):
 		cwd = os.getcwd()
 		if date=="":
@@ -314,17 +315,16 @@ class DB:
 					writer.writerow(list(data))
 			return filename
 		else:
-			sql = "select StuID , count(if(Success=1,1,NULL)) ,"\
-				+ "count(if(Success=0,1,NULL)) from Attendance_%s"\
+			sql = "select StuID , count(if(Success=True,1,NULL)) ,"\
+				+ "count(if(Success=False,1,NULL)) from Attendance_%s"\
 				+ " where Call_Time like \"%s"
 			na = (CourseID, date, )
 			sql = sql % na
 			sql = sql + "%" + "\" group by StuID"
 			self.cursor.execute(sql)
 			result = self.cursor.fetchall()
-			print(result)
+			# print(result)
 			now = datetime.now()
-			print(now)
 			filename = cwd+"/"+str(now)+".csv"
 			with open(filename,"w", newline="") as csvfile:
 				writer = csv.writer(csvfile)
@@ -333,6 +333,7 @@ class DB:
 			return filename
 
 	# return all CourseNames and CourseIDs owned by the Email's owner
+	# return -1 if no such email
 	def getMyCourse(self, Email):
 		sql = "select CourseName, CourseID from Courses where Prof_Email=\"%s\""
 		na = (Email, )
@@ -344,6 +345,7 @@ class DB:
 		return result
 
 	# update new masterToken
+	# return -1 if no such CourseID
 	def newMasterToken(self, CourseID):
 		sql = "select * from Courses where CourseID=\"%s\""
 		na = (CourseID, )
@@ -366,6 +368,27 @@ class DB:
 		self.ServerDB.commit()
 		return masterToken
 
+	# get student name and course name via studentToken and CourseID
+	# return -1 if no such studentToken
+	# return -2 if no such CourseID
+	def getName(self, studentToken, CourseID):
+		sql = "select Name from Stu_%s where Random_Token=\"%s\""
+		na = (CourseID,studentToken, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		studentName=self.cursor.fetchall()
+		if len(studentName)==0:
+			return -1
+		studentName = "".join(list(studentName[0]))
+		sql = "select CourseName from Courses where CourseID=\"%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		courseName=self.cursor.fetchall()
+		if len(courseName)==0:
+			return -2
+		courseName = "".join(list(courseName[0]))
+		return (studentName, courseName)
 
 
 
