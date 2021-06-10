@@ -165,7 +165,8 @@ class DB:
 		# check authority
 		tmpstr = "".join(list(tempToken[0]))
 		if tmpstr==masterToken:
-			sql = "load data local infile \"%s\" into table Stu_%s FIELDS TERMINATED BY ','"
+			sql = "load data local infile \"%s\" into table Stu_%s FIELDS TERMINATED BY ',' \
+			LINES TERMINATED BY \""+r"\n"+"\""
 			na = (path,CourseID, )
 			sql = sql % na
 			self.cursor.execute(sql)
