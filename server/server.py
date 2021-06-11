@@ -8,6 +8,10 @@ import uuid
 from mail import mail
 from DB.DB import DB
 class server:
+    def connectDB(self):
+        self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
+    def closeDB(self):
+        self.db_cursor = self.db.EndConnection()
     def __init__(self,configPath=os.path.join('server/config')):
         self.config = configparser.ConfigParser()
         self.config.read(configPath)
@@ -31,6 +35,10 @@ class server:
                 src_ip = request.environ['HTTP_X_FORWARDED_FOR']
             studentToken = request.values['studentToken']
             courseID = request.values['courseID']
+            self.connectDB()
+            if self.db.UpdateIP(courseID,studentToken,src_ip) == -1:
+                return "Error"
+            self.closeDB()
             print(studentToken,courseID)
             print(src_ip)   
             print(self.debugMsg)
@@ -47,7 +55,11 @@ class server:
             courseID = request.values['courseID']
             link = request.values['link']
             print(masterToken,courseID,link)
+            self.connectDB()
             mailList = self.db.startCourse(masterToken)
+            self.closeDB()
+            if mailList == -1:
+                return "masterToken Error"
             for email,randomToken in mailList:
                     self.mail.startCourse(email,link,courseID,randomToken)
                     print(email,randomToken)      
@@ -61,10 +73,13 @@ class server:
             filepath = os.path.join(self.app.config['UPLOAD_FOLDER'],filename)
             student_form.save(filepath)
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
+            self.connectDB()
             if self.db.addStudents(courseID,masterToken,filepath) == False:
-                return "Error"
+                return jsonify(code = -1)
+            self.closeDB()
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
-            return "New Course"  
+            response = jsonify(code = 0,courseID=courseID)
+            return response  
         @self.app.route("/endCourse",methods=["POST"])
         def endCourse():
             masterToken = request.values["masterToken"]
