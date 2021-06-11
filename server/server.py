@@ -63,7 +63,7 @@ class server:
             self.closeDB()
             if mailList == -1:
                 response = jsonify(code = -1)
-                response = self.appendCORS(response)
+                response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
             for email,randomToken in mailList:
                     self.mail.startCourse(email,link,courseID,randomToken)
