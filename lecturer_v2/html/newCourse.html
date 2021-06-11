@@ -1,0 +1,30 @@
+ <!DOCTYPE html>
+<html>
+  <head>
+	 <!-- <link rel="stylesheet" href="button.css"> -->
+  </head>
+  <body>
+ 		<div id = "newCourseDiv" style="background-color:lightblue;">
+	  	<form id="newCourseForm">
+	  		<label for="course_name">Course name:</label><br>
+	  		<input type = "text" id="course_name" required><br>
+	  		<label for="lecturer_email">Lecturer email:</label><br>
+	  		<input type = "text"id="lecturer_email" required><br>
+	  		<label for="student_info">Student info file:</label><br>
+	  		<input type="file"id="student_info" required><br>
+	  		<!--<input type="button"id="student_info" value="pick file"required ><br>-->
+	  	</form>
+	  	<button id = "register_submit">Submit</button><br>
+  	</div>
+  </body>
+  <script src="../js/jquery-3.6.0.js"></script>
+  <script src="../js/newCourse.js" type="module"></script>
+
+
+  <style type="text/css">
+  	body{
+    	width: 400px;
+    	height:400px;
+	}
+  </style>
+</html>
