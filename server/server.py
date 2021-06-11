@@ -21,6 +21,7 @@ class server:
         self.app.config['UPLOAD_FOLDER'] = self.config['Server']['upload_directory']
         self.db = DB(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
+        self.closeDB()
         @self.app.route('/',methods=['GET','POST'])
         def home():
             if request.method == 'POST':
@@ -72,8 +73,8 @@ class server:
             filename = secure_filename(student_form.filename)
             filepath = os.path.join(self.app.config['UPLOAD_FOLDER'],filename)
             student_form.save(filepath)
+            self.connectDB()            
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
-            self.connectDB()
             if self.db.addStudents(courseID,masterToken,filepath) == False:
                 return jsonify(code = -1)
             self.closeDB()
