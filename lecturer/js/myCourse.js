@@ -1,5 +1,5 @@
 import {sendServer} from './server.js';
-import {mainTabAlert} from './utils.js';
+import {alert} from './utils.js';
 import {mainTabConfirm} from './utils.js';
 import {allFilled} from './utils.js';
 
@@ -61,7 +61,7 @@ function loadCourses(){
 
 async function startCourse(course){
 	if(allFilled(`startCourseForm:${course.courseID}`)){
-		//mainTabAlert(`start course: ${course.name}`);
+		//alert(`start course: ${course.name}`);
 		let data = new FormData();
 		let link = document.getElementById(`link:${course.courseID}`).value;
 		let masterToken = document.getElementById(`masterToken:${course.courseID}`).value;
@@ -69,16 +69,17 @@ async function startCourse(course){
 		data.append('masterToken',masterToken);
 		data.append('link',link);
 		let msg = await sendServer(data,"startCourse");
-		alert('start Course return code: ' + msg.code);
-		if(msg.code == 0){
+		//alert('start Course return code: ' + msg.code);
+		await msg.code;
+		if("code" in msg && msg.code == 0){
    			alert("Emai sent");
    			updateMasterToken(course,masterToken); // save masterToken
 		}else{
-			mainTabAlert("Start course fail");
+			alert("Start course fail");
 		}
 
 	}else{
-		mainTabAlert('Fill all the fields');
+		alert('Fill all the fields');
 	}
 }
 

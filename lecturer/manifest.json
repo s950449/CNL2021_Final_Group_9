@@ -6,7 +6,11 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs","background"],
+  "permissions": ["storage", "activeTab", "scripting", "tabs","background" ],
+  "host_permissions": [ 
+      "https://www.google.com/recaptcha/.js" 
+    ],
+  
   "action": {
     "default_popup": "./html/popup.html",
     "default_icon": {

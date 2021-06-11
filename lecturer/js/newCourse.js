@@ -35,12 +35,12 @@ async function submit(){
   	formData.append("lecturer_email", lecturerEmail);
   	formData.append("student_form",studentForm); 
     
-		let responseMsg = await sendServer(formData,"addCourse");
+		let msg = await sendServer(formData,"addCourse");
 		//responseMsg = {code:0,masterToken:"1234",courseID:"1"}; // for test
 		alert('addCourse: ' + responseMsg.code);
-   		if(responseMsg.code == 0){
+   		if("code" in msg & msg.code == 0 && "courseID" in msg){
    			alert("add course success");
-   			addCourse(courseName,responseMsg.masterToken,responseMsg.courseID);
+   			addCourse(courseName,responseMsg.masterToken,msg.courseID);
 
    		}else{
    			alert("add course fail");

@@ -9,7 +9,6 @@ async function getFromStorage(key) {
 }
 
 export async function sendServer(msg,action){
-
 	//https://stackoverflow.com/questions/5587973/javascript-upload-file
 	const ctrl = new AbortController()    // timeout
 	setTimeout(() => ctrl.abort(), 5000);	

@@ -1,29 +1,43 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <link rel="stylesheet" href="style.css">
         <title>Attendance Checker</title>
+        <script src="js/hCaptchaAPI.js"></script>
     </head>
     <body>
         <form name="infoForm">
             <h1>Attendance Checker</h1>
 
+            <div id="serverInfoDiv">
+                <label> Server Address </label><br>
+                <input type="text" id="serverAddress" name="serverAddress" value=""><br>
+            </div>
+
             <div id="courseInfoDiv">
                 <label> Course Name </label><br>
-                <input type="text" id="courseName" name="courseName" value="Default course name" readonly><br>
-                <label for="courseToken"> Course Token </label><br>
-                <input type="text" id="courseToken" name="courseToken" value="Saved Course Token"><br>
+                <input type="text" id="courseName" name="courseName" value="" readonly><br>
+                <label for="courseID"> Course Token </label><br>
+                <input type="text" id="courseID" name="courseID" value=""><br>
             </div>
 
             <div id="userInfoDiv">
                 <label> User Name </label><br>
-                <input type="text" id="userName" name="userName" value="Default user name" readonly><br>
+                <input type="text" id="userName" name="userName" value="" readonly><br>
                 <label for="userToken" > User Token </label><br>
-                <input type="text" id="userToken" name="userToken" value="Saved User Token"><br>
+                <input type="text" id="userToken" name="userToken" value=""><br>
             </div>
 
             <button id="updateButton">Update</button>
 
-        </form>
+        </form><br>
+
+        <div id="challengeDiv", style="display: none">
+            <div class="h-captcha" data-sitekey="5f21771d-d1af-4c9b-9ce1-236df8ec5708"></div>
+        </div>
+
+        <button id="endClass">End Class</button>
+
     </body>
     <script src="../js/popup.js"></script>
 </html>
