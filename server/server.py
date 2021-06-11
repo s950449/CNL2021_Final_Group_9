@@ -40,7 +40,7 @@ class server:
             if self.db.UpdateIP(courseID,studentToken,src_ip) == -1:
                 response = jsonify(code = -1,msg="Error")
                 response.headers.add('Access-Control-Allow-Origin', '*')
-                return "Error"
+                return response
             self.closeDB()
             print(studentToken,courseID)
             print(src_ip)   
@@ -70,7 +70,7 @@ class server:
                     print(email,randomToken)    
             response = jsonify(code = 0)
             response.headers.add('Access-Control-Allow-Origin', '*')                    
-            return "Add Course"
+            return response
         @self.app.route('/addCourse',methods=['POST'])
         def addCourse():
             student_form = request.files['student_form']
@@ -96,7 +96,7 @@ class server:
             courseID = request.values["courseID"]
             response = jsonify(code = 0)
             response.headers.add('Access-Control-Allow-Origin', '*')            
-            return "End Course"
+            return response
         @self.app.route("/challenge",methods=["POST"])                            
         def challenge():
             masterToken = request.values["masterToken"]
