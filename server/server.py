@@ -31,6 +31,8 @@ class server:
                 src_ip = request.environ['HTTP_X_FORWARDED_FOR']
             studentToken = request.values['studentToken']
             courseID = request.values['courseID']
+            if self.db.UpdateIP(courseID,studentToken,src_ip) == -1:
+                return "Error"
             print(studentToken,courseID)
             print(src_ip)   
             print(self.debugMsg)
@@ -48,6 +50,8 @@ class server:
             link = request.values['link']
             print(masterToken,courseID,link)
             mailList = self.db.startCourse(masterToken)
+            if mailList == -1:
+                return "masterToken Error"
             for email,randomToken in mailList:
                     self.mail.startCourse(email,link,courseID,randomToken)
                     print(email,randomToken)      
@@ -62,9 +66,10 @@ class server:
             student_form.save(filepath)
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
             if self.db.addStudents(courseID,masterToken,filepath) == False:
-                return "Error"
+                return jsonify(code = -1)
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
-            return "New Course"  
+            response = jsonify(code = 0,courseID=courseID)
+            return response  
         @self.app.route("/endCourse",methods=["POST"])
         def endCourse():
             masterToken = request.values["masterToken"]
