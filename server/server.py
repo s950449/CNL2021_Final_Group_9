@@ -82,6 +82,7 @@ class server:
             self.connectDB()            
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
             if self.db.addStudents(courseID,masterToken,filepath) == False:
+                self.closeDB()
                 response = jsonify(code = -1)
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
@@ -104,7 +105,16 @@ class server:
             challengeType = request.values["type"]        
             challengeTarget = request.values["target"]
             challengeTime = request.values["time"]
-            return "Done"
+            response = jsonify(code = 0)
+            response.headers.add('Access-Control-Allow-Origin', '*') 
+            return response
+        @self.app.route("/requestInfo",methods=["POST"])
+        def requestInfo():
+            masterToken = request.values["masterToken"]
+            courseID = request.values["courseID"]
+            requestType = request.values["type"] 
+            self.db_cursor = self.connectDB()
+            self.db_cursor = self.closeDB()
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
