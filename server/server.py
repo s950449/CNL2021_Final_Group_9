@@ -8,9 +8,6 @@ import uuid
 from mail import mail
 from DB.DB import DB
 class server:
-    def appendCORS(response):
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        return response
     def connectDB(self):
         self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
     def closeDB(self):
@@ -42,7 +39,7 @@ class server:
             self.connectDB()
             if self.db.UpdateIP(courseID,studentToken,src_ip) == -1:
                 response = jsonify(code = -1,msg="Error")
-                response = self.appendCORS(response)
+                response.headers.add('Access-Control-Allow-Origin', '*')
                 return "Error"
             self.closeDB()
             print(studentToken,courseID)
@@ -53,7 +50,7 @@ class server:
                 type = 0,
                 timeout = 60
             )
-            response = self.appendCORS(response)
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         @self.app.route('/startCourse',methods=['POST'])
         def startCourse():
@@ -72,7 +69,7 @@ class server:
                     self.mail.startCourse(email,link,courseID,randomToken)
                     print(email,randomToken)    
             response = jsonify(code = 0)
-            response = self.appendCORS(response)                      
+            response.headers.add('Access-Control-Allow-Origin', '*')                    
             return "Add Course"
         @self.app.route('/addCourse',methods=['POST'])
         def addCourse():
@@ -86,19 +83,19 @@ class server:
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
             if self.db.addStudents(courseID,masterToken,filepath) == False:
                 response = jsonify(code = -1)
-                response = self.appendCORS(response)
+                response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
             self.closeDB()
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
             response = jsonify(code = 0,courseID=courseID)
-            response = self.appendCORS(response)
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response  
         @self.app.route("/endCourse",methods=["POST"])
         def endCourse():
             masterToken = request.values["masterToken"]
             courseID = request.values["courseID"]
             response = jsonify(code = 0)
-            response = self.appendCORS(response)            
+            response.headers.add('Access-Control-Allow-Origin', '*')            
             return "End Course"
         @self.app.route("/challenge",methods=["POST"])                            
         def challenge():
