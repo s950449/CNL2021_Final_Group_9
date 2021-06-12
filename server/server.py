@@ -136,7 +136,9 @@ class server:
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
+    my_server.connectSMTP()
     my_server.mail.testMail()
+    my_server.closeSMTP()
     app = my_server.app
     pid = os.fork()
     if pid > 0:
