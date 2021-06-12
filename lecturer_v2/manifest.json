@@ -2,16 +2,16 @@
   "name": "Attendance checker (Lecturer)",
   "description": "Online meeting attendance!",
   "version": "1.0",
-  "manifest_version": 3,
+  "manifest_version": 2,
   "background": {
-    "service_worker": "background.js"
+    "scripts": ["background.js"]
+    //"persistent": false
+    //"service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "scripting", "tabs","background" ],
-  "host_permissions": [ 
-      "https://www.google.com/recaptcha/.js" 
-    ],
-  
-  "action": {
+
+  "permissions": ["storage", "activeTab", "tabs","background","https://www.google.com/" ],
+  "content_security_policy": "script-src 'self' https://www.google.com/ https://www.gstatic.com/ ; object-src 'self'",
+  "browser_action": {
     "default_popup": "./html/popup.html",
     "default_icon": {
       "16": "/images/icon16.png",
@@ -20,6 +20,12 @@
       "128": "/images/icon128.png"
     }
   },
+  /*"content_scripts": [
+    {
+      "matches": ["http://www.google.com/*"],
+      "js": ["https://www.google.com/recaptcha/api.js"]
+    }
+  ],*/
   "icons": {
     "16": "/images/icon16.png",
     "32": "/images/icon32.png",

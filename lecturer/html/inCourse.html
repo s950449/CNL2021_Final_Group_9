@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+  <body>
+		<h3 id = courseName></h3> <!--todo..fill in coursename optional-->
+  	
+  	<div id = "challengeDiv" style="background-color:lightblue;">
+	  	<form id="challengeForm">
+	  		<div id="challengeTypes">
+		  		<h3>Challenge Type:</h3><br>
+		  			<input type="radio" id="captcha" name="challengeType" value="captcha"checked>
+	  				<label for="captcha">Captcha</label>
+	  				<input type="radio" id="ring" name="challengeType" value="ring">
+	  				<label for="ring">Ring</label>
+  			</div>
+
+  			<div id="targetTypes">
+		  		<h3>Target Type:</h3><br>
+		  			<input type="radio" id="all" name="targetType" value="all" checked>
+	  				<label for="all">All</label>
+	  				<input type="radio" id="randomOne" name="targetType" value="randomOne">
+	  				<label for="randomOne">RandomOne</label>
+  			</div>
+
+				<div id="timeTypes">
+		  		<h3>Time limit:</h3><br>
+		  			<input type="radio" id="30" name="timeType" value="30"checked>
+	  				<label for="30">30s</label>
+	  				<input type="radio" id="100" name="timeType" value="100">
+	  				<label for="100">100s</label>
+  			</div>
+
+	  	</form>
+	  	<button id = "challenge_button">Send Challenge</button><br>
+  	</div>
+  	<button id = "end_button">End Course</button><br>
+  	<button id = "info_button">Challenge result Info</button>
+
+  </body>
+  <script src="../js/jquery-3.6.0.js"></script>
+  <script src="../js/inCourse.js" type="module"></script>
+  
+
+
+  <style type="text/css">
+  	body{
+    	width: 400px;
+    	height:800px;
+	}
+  </style>
+</html>

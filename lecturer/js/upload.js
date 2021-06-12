@@ -1,4 +1,3 @@
-alert(`in upload.js`)
 var fileChooser = document.createElement('input');
 fileChooser.type = 'file';
 fileChooser.addEventListener('change', function () {
