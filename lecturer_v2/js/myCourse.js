@@ -21,14 +21,14 @@ function loadCourses(){
 		for (let course of courseList) {
 			var div = document.createElement("div");
 			var startButton = document.createElement("button");
-			startButton.addEventListener('click',function(){
-				startCourse(course);
+			startButton.addEventListener('click',async function(){
+				await startCourse(course);
 			});
 			div.innerHTML = course.name;
 			startButton.innerHTML = `start course`;
 			var removeButton = document.createElement("button");
-			removeButton.addEventListener('click',function(){
-				removeCourse(course);
+			removeButton.addEventListener('click', async function(){
+				await removeCourse(course);
 			});
 
 			removeButton.innerHTML = `remove course<br>`;
@@ -53,8 +53,8 @@ function loadCourses(){
 	var startButtons = document.querySelectorAll(".startButton");
 	chrome.storage.sync.get("courseList",({courseList}) =>{
 		for (var i = 0; i < startButtons.length; i++) {	
-			startButtons[i].onclick = function (){
-				startCourse(courseList.get(startButtons[i].tag));
+			startButtons[i].onclick = async function (){
+				await startCourse(courseList.get(startButtons[i].tag));
 			}
 		}
 	});
@@ -70,12 +70,14 @@ async function startCourse(course){
 		data.append('masterToken',masterToken);
 		data.append('link',link);
 		let msg = await sendServer(data,"startCourse");
-		//alert('start Course return code: ' + msg.code);
+		alert('start Course return code: ' + msg.code);
 		await msg.code;
-
-		if("code" in msg && msg.code == 0){
+		await msg.url;
+		alert(msg.url);
+		if("code" in msg && msg.code == 0 && "url" in msg ){
    			alert("Emai sent");
    			updateMasterToken(course,masterToken); // save masterToken
+   			chrome.tabs.create({ url: masg.url });
 		}else{
 			mainTabAlert("Start course fail");
 		}
