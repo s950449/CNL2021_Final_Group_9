@@ -1,11 +1,13 @@
 from re import M
-from flask import Flask, json,request, render_template,jsonify,g
+from flask import Flask, json,request, render_template,jsonify,g,send_file,make_response
 from flask.views import View
 from werkzeug.utils import secure_filename
 import requests
 import configparser
 import os
 import uuid
+
+from werkzeug.wrappers import response
 from mail import mail
 from DB.DB import DB
 class server:
@@ -129,7 +131,10 @@ class server:
             filepath = self.db.getStudent(courseID,masterToken,requestDate)
             print(filepath)
             self.db_cursor = self.closeDB()
-            return app.send_static_file(filepath)
++           response = make_response(send_file(filepath,as_attachment=True))
++           response.headers.add('Access-Control-Allow-Origin','*')
++           return response
+
         @self.app.route("/getName",methods=["POST"])
         def getName():
             studentToken = request.values['studentToken']
