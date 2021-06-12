@@ -129,7 +129,8 @@ class server:
             studentToken = request.values['studentToken']
             courseID = request.values['courseID']
             self.db_cursor = self.connectDB()
-            (studentName,courseName) = self.db.getName(studentToken,courseID)
+            studentName,courseName = self.db.getName(studentToken,courseID)
+            self.db_cursor = self.closeDB()
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
