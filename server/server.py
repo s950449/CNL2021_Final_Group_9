@@ -1,3 +1,4 @@
+from re import M
 from flask import Flask, json,request, render_template,jsonify,g
 from flask.views import View
 from werkzeug.utils import secure_filename
@@ -120,10 +121,15 @@ class server:
         @self.app.route("/requestInfo",methods=["POST"])
         def requestInfo():
             masterToken = request.values["masterToken"]
-            courseID = request.values["courseID"]
-            requestType = request.values["type"] 
+            courseID = request.values["courseID"] 
+            requestDate = request.values["date"]
+            if requestDate == "all":
+                requestDate = ""
             self.db_cursor = self.connectDB()
+            filepath = self.db.getStudent(courseID,masterToken,requestDate)
+            print(filepath)
             self.db_cursor = self.closeDB()
+            return app.send_static_file(filepath)
         @self.app.route("/getName",methods=["POST"])
         def getName():
             studentToken = request.values['studentToken']
