@@ -29,10 +29,10 @@
                 mode: 'cors'
             })
             .then(response => {
-                if (!response.ok)
-                    console.log("Connection lost");
-                else
+                if("code" in msg & msg.code == 0)
                     console.log("Send challenge result success");
+                else
+                    console.log("Connection lost");
             })
             .catch((error) => {
                 console.error(error);
