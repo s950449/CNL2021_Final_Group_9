@@ -2,6 +2,7 @@ from re import M
 from flask import Flask, json,request, render_template,jsonify,g,send_file,make_response
 from flask.views import View
 from werkzeug.utils import secure_filename
+from flask import render_template
 import requests
 import configparser
 import os
@@ -147,7 +148,7 @@ class server:
             return response        
         @self.app.route('/recapchaDomain',methods=['GET'])
         def recapchaDomain():
-            return render_template("challenge.html")
+            return render_template("recapchaDomain.html")
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
