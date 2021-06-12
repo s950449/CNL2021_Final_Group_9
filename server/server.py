@@ -145,6 +145,9 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
+        @self.app.route('/recapchaDomain',methods=['GET'])
+        def recapchaDomain():
+            return render_template("challenge.html")
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
