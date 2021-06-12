@@ -8,6 +8,10 @@ import uuid
 from mail import mail
 from DB.DB import DB
 class server:
+    def connectSMTP(self):
+        self.mail.connect()
+    def closeSMTP(self):
+        self.mail.close()
     def connectDB(self):
         self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
     def closeDB(self):
@@ -22,6 +26,7 @@ class server:
         self.db = DB(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         self.db_cursor = self.db.link(self.config['SQL']['user'],self.config['SQL']['password'],self.config['SQL']['host'],"Testing")
         self.closeDB()
+        self.closeSMTP()
         @self.app.route('/',methods=['GET','POST'])
         def home():
             if request.method == 'POST':
@@ -65,10 +70,12 @@ class server:
                 response = jsonify(code = -1)
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
+            self.connectSMTP()
             for email,randomToken in mailList:
                     self.mail.startCourse(email,link,courseID,randomToken)
-                    print(email,randomToken)    
-            response = jsonify(code = 0)
+                    print(email,randomToken)
+            self.closeSMTP()    
+            response = jsonify(code = 0,url=link+"?courseID="+courseID)
             response.headers.add('Access-Control-Allow-Origin', '*')                    
             return response
         @self.app.route('/addCourse',methods=['POST'])
@@ -87,8 +94,10 @@ class server:
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
             self.closeDB()
+            self.connectSMTP()
             self.mail.newCourse(lecturer_email,courseID,course_name,masterToken)
-            response = jsonify(code = 0,courseID=courseID)
+            self.closeSMTP()
+            response = jsonify(code = 0,courseID=courseID,masterToken=masterToken)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response  
         @self.app.route("/endCourse",methods=["POST"])
@@ -115,6 +124,15 @@ class server:
             requestType = request.values["type"] 
             self.db_cursor = self.connectDB()
             self.db_cursor = self.closeDB()
+        @self.app.route("/getName",methods=["POST"])
+        def getName():
+            studentToken = request.values['studentToken']
+            courseID = request.values['courseID']
+            self.db_cursor = self.connectDB()
+            (studentName,courseName) = self.db.getName(studentToken,courseID)
+            response = jsonify(code = 0,studentName=studentName,courseName=courseName)
+            response.headers.add('Access-Control-Allow-Origin', '*')     
+            return response        
 if __name__ == '__main__':
     from sys import argv
     my_server = server()

@@ -6,6 +6,8 @@ class mail:
     def __init__(self,config_path):
         self.config = configparser.ConfigParser()
         self.config.read(config_path)
+        self.connect()
+    def connect(self):
         self.admin = self.config['Mail']['admin']
         self.sender = self.config['Mail']['sender']
         self.smtp = smtplib.SMTP(self.config['Mail']['server'])
@@ -13,6 +15,8 @@ class mail:
         self.smtp.ehlo()
         self.smtp.starttls()
         self.smtp.login(self.sender,self.password)
+    def close(self):
+        self.smtp.close()
     def testMail(self):
         msg = EmailMessage()
         msg['Subject'] = "Test Mail"
