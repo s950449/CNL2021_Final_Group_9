@@ -110,8 +110,8 @@ function checkChallengeWithServer() {
 
 function challenge(type, timeout) {
     console.log('type: ', type, 'timeout: ', timeout);
-    // TODO: add challenge
-    // chrome.runtime.sendMessage({msg: "Challenge"});
+    const newurl = "http://" + ServerAddress + "/capchaDomain";
+    chrome.tabs.create({ url: newURL });
 }
 
 function onConnectionLost() {
