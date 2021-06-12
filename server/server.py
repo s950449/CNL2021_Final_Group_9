@@ -131,9 +131,9 @@ class server:
             filepath = self.db.getStudent(courseID,masterToken,requestDate)
             print(filepath)
             self.db_cursor = self.closeDB()
-+           response = make_response(send_file(filepath,as_attachment=True))
-+           response.headers.add('Access-Control-Allow-Origin','*')
-+           return response
+            response = make_response(send_file(filepath,as_attachment=True))
+            response.headers.add('Access-Control-Allow-Origin','*')
+            return response
 
         @self.app.route("/getName",methods=["POST"])
         def getName():
