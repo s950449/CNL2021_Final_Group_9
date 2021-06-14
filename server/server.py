@@ -146,7 +146,7 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
-        @self.app.route('/recaptchaDomain',methods=['POST','GET'])
+        @self.app.route('/recaptchaDomain',methods=['GET'])
         def recaptchaDomain():
             return render_template("recaptchaDomain.html")
         @self.app.route('/challenge',methods=['POST'])
