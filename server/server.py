@@ -159,9 +159,9 @@ class server:
             payload = {
                 'secret': recaptcha_secret_key,
                 'response': token,
-                'remoteip': recaptcha_url,
+                'remoteip': request.remote_addr,
             }
-            response = requests.post(, data = payload)
+            response = requests.post(recaptcha_url, data = payload)
             result = response.json()
             success = result.get('success', None)
             self.connectDB()
