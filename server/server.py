@@ -7,7 +7,7 @@ import requests
 import configparser
 import os
 import uuid
-
+from datetime import datetime
 from werkzeug.wrappers import response
 from mail import mail
 from DB.DB import DB
@@ -153,12 +153,13 @@ class server:
                 response.headers.add('Access-Control-Allow-Origin','*')
                 return response
             print("123")
-            print(request)
+            print(request.values)
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
-            recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
-            token = request.form["g-recaptcha_response"]
+            recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8Cserk'
+            token = request.form["g-recaptcha-response"]
             courseID = request.form["courseID"]
             studentToken = request.form["studentToken"]
+            print("acldajsfkdjsalkf")
             payload = {
                 'secret': recaptcha_secret_key,
                 'response': token,
@@ -167,15 +168,15 @@ class server:
             print('test')
             response = requests.post(recaptcha_url, data = payload)
             result = response.json()
+            print(result)
             success = result.get('success', None)
             if success == False:
                 response = jsonify(code = -1)
                 response.headers.add('Access-Control-Allow-Origin', '*') 
                 return response
-            self.connectDB()
-            time =Date();
-            timestamp = time.getTime()
-            self.DB.challenge(courseID,studentToken,string(timestamp),"0",success)
+            self.connectDB();
+            timestamp = datetime.today()
+            self.db.challenge(courseID,studentToken,timestamp,"0",success)
             self.closeDB()
             response = jsonify(code = 0)
             response.headers.add('Access-Control-Allow-Origin', '*') 
