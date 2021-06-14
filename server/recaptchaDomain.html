@@ -5,40 +5,11 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
-    <form name="challengeForm">
+    <form name="challengeForm" action="/challenge" method = "post">
         <input type="hidden" id="courseID" name="courseID" value=""><br>
         <input type="hidden" id="studentToken" name="studentToken" value=""><br>
         <div class="g-recaptcha" data-sitekey="6Le-piobAAAAAJXR_vaBmeCbQtdOaMmk0k42IVnS"></div><br />
-        <input type='button' name="submit" value="submit" onclick="processFormData();" />
+        <input type="submit" value="Submit">
     </form><br>
-    <script>
-        function processFormData() {
-            const courseIDElement = document.getElementById("courseID");
-            const courseID = courseIDElement.value;
-            const studentTokenElement = document.getElementById("studentToken");
-            const studentToken = studentTokenElement.value;
-            token = grecaptcha.getResponse();
-            const data = new FormData();
-            data.append("studentToken", studentToken);
-            data.append("courseID", courseID);
-            data.append("token", token);
-            const url = "http://seekrealthing.net/challenge";
-            fetch(url, {
-                method: 'POST',
-                body: data,
-                mode: 'cors'
-            })
-            .then(response => {
-                if("code" in response && response.code == 0)
-                    console.log("Send challenge result success");
-                else
-                    console.log("Connection lost");
-            })
-            .catch((error) => {
-                console.error(error);
-                console.log("Connection lost");
-            })
-        }
-    </script>
 </body>
 </html>
