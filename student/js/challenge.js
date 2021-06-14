@@ -1,5 +1,6 @@
 let courseIDInput = document.getElementById('courseID');
 let userTokenInput = document.getElementById('studentToken');
+let form = document.getElementsByName('challengeForm');
 
 window.onload = function(e) {
     console.log("loaded");

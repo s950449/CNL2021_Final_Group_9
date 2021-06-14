@@ -6,6 +6,8 @@ let UserName = 'default user name';
 let InClass = 0;
 const checkChallengeInterval = 10000;
 
+const protocol = 'https://'
+
 chrome.runtime.onInstalled.addListener(
     () => {
         chrome.storage.local.set({ 'ServerAddress':ServerAddress, 'CourseID':CourseID, 'UserToken':UserToken, 'InClass':InClass,
@@ -82,7 +84,7 @@ function onConnectionLost() {
 }
 
 function checkChallenge() {
-    const url = "http://" + ServerAddress + "/checkChallenge";
+    const url = protocol + ServerAddress + "/checkChallenge";
     console.log("checkChallenge", url);
 
     const data = new FormData();
@@ -106,7 +108,7 @@ function checkChallenge() {
 }
 
 function getName() {
-    const url = "http://" + ServerAddress + "/getName";
+    const url = protocol + ServerAddress + "/getName";
 
     console.log("udpateName", url);
 
@@ -131,7 +133,7 @@ function getName() {
 
 function challenge(type, timeout) {
     console.log('type: ', type, 'timeout: ', timeout);
-    const url = "http://" + ServerAddress + "/acceptChallenge";
+    const url = protocol + ServerAddress + "/acceptChallenge";
     chrome.windows.create({url: url, type: 'popup', width:500, height:250}, function(newWindow) {
         chrome.tabs.executeScript(newWindow.tabs[0].id, { file: "./js/challenge.js" })
         setTimeout(function(){

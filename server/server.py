@@ -52,7 +52,7 @@ class server:
                 return response
             self.closeDB()
             print(studentToken,courseID)
-            print(src_ip)   
+            print(src_ip)
             print(self.debugMsg)
             response = jsonify(
                 hasChallenge = 0,
@@ -78,9 +78,9 @@ class server:
             for email,randomToken in mailList:
                     self.mail.startCourse(email,link,courseID,randomToken)
                     print(email,randomToken)
-            self.closeSMTP()    
+            self.closeSMTP()
             response = jsonify(code = 0,url=link+"?courseID="+courseID)
-            response.headers.add('Access-Control-Allow-Origin', '*')                    
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         @self.app.route('/addCourse',methods=['POST'])
         def addCourse():
@@ -90,7 +90,7 @@ class server:
             filename = secure_filename(student_form.filename)
             filepath = os.path.join(self.app.config['UPLOAD_FOLDER'],filename)
             student_form.save(filepath)
-            self.connectDB()            
+            self.connectDB()
             courseID,masterToken = self.db.addCourse(course_name,"Test",lecturer_email)
             if self.db.addStudents(courseID,masterToken,filepath) == False:
                 self.closeDB()
@@ -103,28 +103,28 @@ class server:
             self.closeSMTP()
             response = jsonify(code = 0,courseID=courseID,masterToken=masterToken)
             response.headers.add('Access-Control-Allow-Origin', '*')
-            return response  
+            return response
         @self.app.route("/endCourse",methods=["POST"])
         def endCourse():
             masterToken = request.values["masterToken"]
             courseID = request.values["courseID"]
             response = jsonify(code = 0)
-            response.headers.add('Access-Control-Allow-Origin', '*')            
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
-        @self.app.route("/challenge",methods=["POST"])                            
+        @self.app.route("/challenge",methods=["POST"])
         def challenge():
             masterToken = request.values["masterToken"]
             courseID = request.values["courseID"]
-            challengeType = request.values["type"]        
+            challengeType = request.values["type"]
             challengeTarget = request.values["target"]
             challengeTime = request.values["time"]
             response = jsonify(code = 0)
-            response.headers.add('Access-Control-Allow-Origin', '*') 
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         @self.app.route("/requestInfo",methods=["POST"])
         def requestInfo():
             masterToken = request.values["masterToken"]
-            courseID = request.values["courseID"] 
+            courseID = request.values["courseID"]
             requestDate = request.values["date"]
             if requestDate == "all":
                 requestDate = ""
@@ -144,8 +144,8 @@ class server:
             studentName,courseName = self.db.getName(studentToken,courseID)
             self.db_cursor = self.closeDB()
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
-            response.headers.add('Access-Control-Allow-Origin', '*')     
-            return response        
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
         @self.app.route('/acceptChallenge',methods=['GET','POST'])
         def recaptchaDomain():
             if request.method == 'GET':
@@ -171,15 +171,15 @@ class server:
             print(result)
             success = result.get('success', None)
             if success == False:
-                response = jsonify(code = -1)
-                response.headers.add('Access-Control-Allow-Origin', '*') 
+                response = make_response(render_template("challengeFailed.html"))
+                response.headers.add('Access-Control-Allow-Origin','*')
                 return response
-            self.connectDB();
+            self.connectDB()
             timestamp = datetime.today()
             self.db.challenge(courseID,studentToken,timestamp,"0",success)
             self.closeDB()
-            response = jsonify(code = 0)
-            response.headers.add('Access-Control-Allow-Origin', '*') 
+            response = make_response(render_template("challengeSuccessed.html"))
+            response.headers.add('Access-Control-Allow-Origin', '*')
             return response
 if __name__ == '__main__':
     from sys import argv
