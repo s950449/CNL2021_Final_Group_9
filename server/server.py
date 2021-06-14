@@ -157,14 +157,18 @@ class server:
             courseID = request.values["courseID"]
             studentToken = request.values["studentToken"]
             payload = {
-                'secret': secret_key,
+                'secret': recaptcha_secret_key,
                 'response': token,
-                'remoteip': request.remote_addr,
+                'remoteip': recaptcha_url,
             }
             response = requests.post(, data = payload)
             result = response.json()
             success = result.get('success', None)
-            #need to add student data to DB
+            self.connectDB()
+            time = new Date();
+            timestamp = time.getTime()
+            self.DB.challenge(courseID,studentToken,string(timestamp),"0",success)
+            self.closeDB()
             response = jsonify(code = 0)
             response.headers.add('Access-Control-Allow-Origin', '*') 
             return response
