@@ -1,5 +1,5 @@
 let courseIDInput = document.getElementById('courseID');
-let userTokenInput = document.getElementById('userToken');
+let userTokenInput = document.getElementById('studentToken');
 
 window.onload = function(e) {
     console.log("loaded");
