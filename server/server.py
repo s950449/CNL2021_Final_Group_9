@@ -164,6 +164,10 @@ class server:
             response = requests.post(recaptcha_url, data = payload)
             result = response.json()
             success = result.get('success', None)
+            if !success:
+                response = jsonify(code = -1)
+                response.headers.add('Access-Control-Allow-Origin', '*') 
+                return response
             self.connectDB()
             time = new Date();
             timestamp = time.getTime()
