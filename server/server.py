@@ -146,10 +146,10 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
-        @self.app.route('/recaptchaDomain',methods=['GET'])
+        @self.app.route('/acceptchallenge',methods=['GET'])
         def recaptchaDomain():
             return render_template("recaptchaDomain.html")
-        @self.app.route('/challenge',methods=['POST'])
+        @self.app.route('/recaptcha',methods=['POST'])
         def verify_recaptcha(self, token):
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
             recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
