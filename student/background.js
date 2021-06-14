@@ -131,7 +131,7 @@ function getName() {
 
 function challenge(type, timeout) {
     console.log('type: ', type, 'timeout: ', timeout);
-    const url = "http://" + ServerAddress + "/challenge";
+    const url = "http://" + ServerAddress + "/acceptChallenge";
     chrome.windows.create({url: url, type: 'popup', width:500, height:250}, function(newWindow) {
         chrome.tabs.executeScript(newWindow.tabs[0].id, { file: "./js/challenge.js" })
         setTimeout(function(){
