@@ -2,6 +2,7 @@ from re import M
 from flask import Flask, json,request, render_template,jsonify,g,send_file,make_response
 from flask.views import View
 from werkzeug.utils import secure_filename
+from flask import render_template
 import requests
 import configparser
 import os
@@ -145,6 +146,28 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
+        @self.app.route('/recapchaDomain',methods=['GET'])
+        def recapchaDomain():
+            return render_template("recapchaDomain.html")
+        @self.app.route('/challenge',methods=['POST'])
+        def verify_recaptcha(self, token):
+            recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
+            recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
+            token = request.values["token"]
+            courseID = request.values["courseID"]
+            studentToken = request.values["studentToken"]
+            payload = {
+                'secret': secret_key,
+                'response': token,
+                'remoteip': request.remote_addr,
+            }
+            response = requests.post(, data = payload)
+            result = response.json()
+            success = result.get('success', None)
+            #need to add student data to DB
+            response = jsonify(code = 0)
+            response.headers.add('Access-Control-Allow-Origin', '*') 
+            return response
 if __name__ == '__main__':
     from sys import argv
     my_server = server()
