@@ -150,12 +150,12 @@ class server:
         def recaptchaDomain():
             return render_template("recaptchaDomain.html")
         @self.app.route('/recaptcha',methods=['POST'])
-        def verify_recaptcha(self, token):
+        def verify_recaptcha():
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
             recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
-            token = request.values["token"]
-            courseID = request.values["courseID"]
-            studentToken = request.values["studentToken"]
+            token = request.form["token"]
+            courseID = request.form["courseID"]
+            studentToken = request.form["studentToken"]
             payload = {
                 'secret': recaptcha_secret_key,
                 'response': token,
