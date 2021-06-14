@@ -7,7 +7,7 @@
 <body>
     <form name="challengeForm">
         <input type="hidden" id="courseID" name="courseID" value=""><br>
-        <input type="hidden" id="userToken" name="userToken" value=""><br>
+        <input type="hidden" id="studentToken" name="studentToken" value=""><br>
         <div class="g-recaptcha" data-sitekey="6Le-piobAAAAAJXR_vaBmeCbQtdOaMmk0k42IVnS"></div><br />
         <input type='button' name="submit" value="submit" onclick="processFormData();" />
     </form><br>
@@ -15,11 +15,11 @@
         function processFormData() {
             const courseIDElement = document.getElementById("courseID");
             const courseID = courseIDElement.value;
-            const userTokenElement = document.getElementById("userToken");
-            const userToken = emailElement.value;
+            const studentTokenElement = document.getElementById("studentToken");
+            const studentToken = studentTokenElement.value;
             token = grecaptcha.getResponse();
             const data = new FormData();
-            data.append("studentToken", userToken);
+            data.append("studentToken", studentToken);
             data.append("courseID", courseID);
             data.append("token", token);
             const url = "http://seekrealthing.net/challenge";
