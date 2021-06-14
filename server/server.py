@@ -146,11 +146,14 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
-        @self.app.route('/acceptchallenge',methods=['GET'])
+        @self.app.route('/acceptChallenge',methods=['GET','POST'])
         def recaptchaDomain():
-            return render_template("recaptchaDomain.html")
-        @self.app.route('/recaptcha',methods=['POST'])
-        def verify_recaptcha():
+            if request.method == 'GET':
+                response = make_response(render_template("recaptchaDomain.html"))
+                response.headers.add('Access-Control-Allow-Origin','*')
+                return response
+            print("123")
+            print(request)
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
             recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
             token = request.form["g-recaptcha_response"]
@@ -161,15 +164,16 @@ class server:
                 'response': token,
                 'remoteip': request.remote_addr,
             }
+            print('test')
             response = requests.post(recaptcha_url, data = payload)
             result = response.json()
             success = result.get('success', None)
-            if !success:
+            if success == False:
                 response = jsonify(code = -1)
                 response.headers.add('Access-Control-Allow-Origin', '*') 
                 return response
             self.connectDB()
-            time = new Date();
+            time =Date();
             timestamp = time.getTime()
             self.DB.challenge(courseID,studentToken,string(timestamp),"0",success)
             self.closeDB()
