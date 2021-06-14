@@ -153,7 +153,7 @@ class server:
         def verify_recaptcha():
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
             recaptcha_secret_key = '6Le-piobAAAAAEuu2osQS1soaRWla-uBMn8CserkY'
-            token = request.form["token"]
+            token = request.form["g-recaptcha_response"]
             courseID = request.form["courseID"]
             studentToken = request.form["studentToken"]
             payload = {
