@@ -15,7 +15,6 @@ endCourseButton.addEventListener('click', function(){
     chrome.storage.local.set({ InClass });
 });
 
-
 window.onload = function(e) {
     chrome.storage.local.get(null, (data) => {
         courseIDInput.value = data.CourseID;
@@ -33,12 +32,3 @@ function formSubmitted() {
 
     chrome.storage.local.set({ 'CourseID':CourseID, 'UserToken':UserToken, 'ServerAddress':ServerAddress });
 }
-
-chrome.runtime.onMessage.addListener(
-    function(request, sender, sendResponse) {
-        console.log("onMessage");
-        if (request.msg === "Challenge") {
-            challengeDiv.style.display = "block";
-        }
-    }
-);

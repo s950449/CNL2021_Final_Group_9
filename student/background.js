@@ -1,4 +1,4 @@
-let ServerAddress = 'linux13.csie.ntu.edu.tw:8000';
+let ServerAddress = 'seekrealthing.net';
 let CourseID = 'default course token';
 let CourseName = 'default course name';
 let UserToken = 'default user token';
