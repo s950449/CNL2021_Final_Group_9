@@ -146,9 +146,9 @@ class server:
             response = jsonify(code = 0,studentName=studentName,courseName=courseName)
             response.headers.add('Access-Control-Allow-Origin', '*')     
             return response        
-        @self.app.route('/recapchaDomain',methods=['GET'])
-        def recapchaDomain():
-            return render_template("recapchaDomain.html")
+        @self.app.route('/recaptchaDomain',methods=['GET'])
+        def recaptchaDomain():
+            return render_template("recaptchaDomain.html")
         @self.app.route('/challenge',methods=['POST'])
         def verify_recaptcha(self, token):
             recaptcha_url = 'https://www.google.com/recaptcha/api/siteverify'
