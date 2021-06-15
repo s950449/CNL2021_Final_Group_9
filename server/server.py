@@ -54,10 +54,24 @@ class server:
             print(studentToken,courseID)
             print(src_ip)
             print(self.debugMsg)
+            self.connectDB()
+            result = self.db.getActiveChallenges(courseID)
+            self.closeDB()
+            if result == -1:
+                response = jsonify(code = -1,msg="No Such CourseID")
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
+            elif result == 0:
+                response = jsonify(hasChallenge = 0)
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response 
+            challengeID,timeout,timestamp = result          
             response = jsonify(
-                hasChallenge = 0,
+                hasChallenge = 1,
+                challengeID = challengeID,
                 type = 0,
-                timeout = 60
+                timeout =  timeout,
+                timestamp = timestamp
             )
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
@@ -118,7 +132,14 @@ class server:
             challengeType = request.values["type"]
             challengeTarget = request.values["target"]
             challengeTime = request.values["time"]
-            response = jsonify(code = 0)
+            self.connectDB()
+            challengeID = self.db.addChallenge(courseID,challengeType,challengeTarget,challengeTime,datetime.now())
+            self.closeDB()
+            if challengeID == -1:
+                response = jsonify(code = -1,msg="No Such CourseID")
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
+            response = jsonify(code = 0,challengeID = challengeID)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
         @self.app.route("/requestInfo",methods=["POST"])
@@ -159,6 +180,7 @@ class server:
             token = request.form["g-recaptcha-response"]
             courseID = request.form["courseID"]
             studentToken = request.form["studentToken"]
+            challengeID = request.form['challengeID']
             print("acldajsfkdjsalkf")
             payload = {
                 'secret': recaptcha_secret_key,
@@ -176,7 +198,8 @@ class server:
                 return response
             self.connectDB()
             timestamp = datetime.today()
-            self.db.challenge(courseID,studentToken,timestamp,"0",success)
+            self.db.setStudentAttendance(courseID,challengeID,self.db.getStuID(courseID,studentToken),timestamp,success)
+            #self.db.challenge(courseID,studentToken,timestamp,"0",success)
             self.closeDB()
             response = make_response(render_template("challengeSuccessed.html"))
             response.headers.add('Access-Control-Allow-Origin', '*')
