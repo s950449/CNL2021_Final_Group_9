@@ -152,7 +152,7 @@ class DB:
 		sql = "CREATE TABLE Challenge_%s ("\
 			+"ChallengeID int NOT NULL,"\
 			+"type int NOT NULL,"\
-			+"target varchar(30),"\
+			+"target int NOT NULL,"\
 			+"timeout int NOT NULL,"\
 			+"issuedTimestamp varchar(30) NOT NULL,"\
 			+"isActive boolean NOT NULL,"\
@@ -408,7 +408,7 @@ class DB:
 	# add challenge data to challenge table
 	# return challengeID if success
 	# return -1 if no such courseID
-	def addChallenge(self, CourseID, Type, timeout, issuedTimestamp, target=""):
+	def addChallenge(self, CourseID, Type,target, timeout, issuedTimestamp):
 		sql = "select count(*) from Challenge_%s"
 		na = (CourseID, )
 		sql = sql % na
@@ -521,7 +521,7 @@ class DB:
 		result=self.cursor.fetchall()
 		if len(result)==0:
 			return -1
-		sql = "select ChallengeID from Attendance_%s where StuID=\"%s\""
+		sql = "select ChallengeID from Attendance_%s where StuID=\"%s\" and Success=false"
 		na = (CourseID, StuID, )
 		sql = sql % na
 		self.cursor.execute(sql)

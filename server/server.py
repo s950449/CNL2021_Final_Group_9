@@ -66,30 +66,40 @@ class server:
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response 
             for ids,timeouts,timestamps in result:
-                if (timestamps + timedelta(seconds=timeouts)) > datetime.now():
+                print(timestamps)
+                if (datetime.strptime(timestamps,"%Y-%m-%d %H:%M:%S.%f") + timedelta(seconds=timeouts)) < datetime.now():
                     self.connectDB()
                     status = self.db.setActive(courseID,ids,False)
                     self.closeDB()
             self.connectDB()
             result = self.db.getStudentChallenges(courseID,self.db.getStuID(courseID,studentToken))
             self.closeDB()
-            challengeID,challengeType,timeout,timestamp =result 
-            hasChallenge = 1
-            if result == 0:
-                hasChallenge = 0
-                challengeID = ""
-                challengeType = ""
-                timeout = 0
-                timestamp = ""
-            response = jsonify(
-                hasChallenge = hasChallenge,
-                challengeID = challengeID,
-                type = challengeType,
-                timeout =  timeout,
-                timestamp = timestamp
-            )
-            response.headers.add('Access-Control-Allow-Origin', '*')
-            return response
+            print(result)
+            if result == 0 or len(result) == 0:
+                response = jsonify(
+                        hasChallenge = 0,
+                        challengeID = 0,
+                        type = 0,
+                        timeout = 0,
+                        timestamp = 0
+                )
+                response.headers.add('Access-Control-Allow-Origin','*')
+                return response
+            for abc_tuple in result:
+                challengeID = abc_tuple[0][0]
+                challengeType = abc_tuple[0][1]
+                timeout = abc_tuple[0][2]
+                timestamp = abc_tuple[0][3]
+                hasChallenge = 1
+                response = jsonify(
+                    hasChallenge = hasChallenge,
+                    challengeID = challengeID,
+                    type = challengeType,
+                    timeout =  timeout,
+                    timestamp = timestamp
+                )
+                response.headers.add('Access-Control-Allow-Origin', '*')
+                return response
         @self.app.route('/startCourse',methods=['POST'])
         def startCourse():
             masterToken = request.values['masterToken']
@@ -147,13 +157,23 @@ class server:
             challengeType = request.values["type"]
             challengeTarget = request.values["target"]
             challengeTime = request.values["time"]
+            print(request.values)
+            challengeType = 0
             self.connectDB()
+            challengeTarget = 0
             challengeID = self.db.addChallenge(courseID,challengeType,challengeTarget,challengeTime,datetime.now())
             self.closeDB()
             if challengeID == -1:
                 response = jsonify(code = -1,msg="No Such CourseID")
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response
+            self.connectDB()
+            result = self.db.getIP(courseID,masterToken)
+            self.closeDB()
+            for token,naidesu in result:
+                self.connectDB()
+                self.db.challenge(courseID,token,datetime.now(),challengeID,False)
+                self.closeDB()
             response = jsonify(code = 0,challengeID = challengeID)
             response.headers.add('Access-Control-Allow-Origin', '*')
             return response
@@ -213,7 +233,8 @@ class server:
                 return response
             self.connectDB()
             timestamp = datetime.today()
-            self.db.setStudentAttendance(courseID,challengeID,self.db.getStuID(courseID,studentToken),timestamp,success)
+            result = self.db.setStudentAttendance(courseID,challengeID,self.db.getStuID(courseID,studentToken),timestamp,success)
+            print(result)
             #self.db.challenge(courseID,studentToken,timestamp,"0",success)
             self.closeDB()
             response = make_response(render_template("challengeSuccessed.html"))
