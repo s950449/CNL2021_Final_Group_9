@@ -534,13 +534,15 @@ class DB:
 			challengeids.append(x[0])
 		# print(challengeids)
 		returnlist=[]
-		for id in challengeids:
-			sql = "select ChallengeID, type, timeout from Challenge_%s where ChallengeID=\"%s\""
-			na = (CourseID, id, )
+		for chid in challengeids:
+			sql = "select ChallengeID, type, timeout, issuedTimestamp from Challenge_%s "\
+				+"where ChallengeID=\"%s\" and isActive=1"
+			na = (CourseID, chid, )
 			sql = sql % na
 			self.cursor.execute(sql)
 			result=self.cursor.fetchall()
-			returnlist.append(result)
+			if len(result)!=0:
+				returnlist.append(result)
 		return returnlist
 
 	# update attendance talbe
