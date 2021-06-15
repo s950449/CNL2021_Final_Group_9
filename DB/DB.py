@@ -19,6 +19,7 @@ class DB:
 			)
 		self.cursor = self.ServerDB.cursor()
 		self.cursor.execute("set global local_infile=1")
+		self.ServerDB.commit()
 		# create database
 		sql = "CREATE DATABASE IF NOT EXISTS %s"
 		na = (self.dbName, )
@@ -141,8 +142,21 @@ class DB:
 			+"StuID varchar(10) NOT NULL,"\
 			+"Call_Time varchar(64) NOT NULL,"\
 			+"Success boolean NOT NULL,"\
-			+"ChallengeID varchar(20) NOT NULL,"\
+			+"ChallengeID int NOT NULL,"\
 			+"PRIMARY KEY (StuID, Call_Time)"\
+			+")"
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		sql = "CREATE TABLE Challenge_%s ("\
+			+"ChallengeID int NOT NULL,"\
+			+"type int NOT NULL,"\
+			+"target int NOT NULL,"\
+			+"timeout int NOT NULL,"\
+			+"issuedTimestamp varchar(30) NOT NULL,"\
+			+"isActive boolean NOT NULL,"\
+			+"PRIMARY KEY (ChallengeID)"\
 			+")"
 		na = (CourseID, )
 		sql = sql % na
@@ -391,18 +405,165 @@ class DB:
 		courseName = "".join(list(courseName[0]))
 		return (studentName, courseName)
 
+	# add challenge data to challenge table
+	# return challengeID if success
+	# return -1 if no such courseID
+	def addChallenge(self, CourseID, Type, target, timeout, issuedTimestamp):
+		sql = "select count(*) from Challenge_%s"
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		ChallengeID = result[0][0]+1
+		# print(ChallengeID)
+		sql = "INSERT INTO Challenge_%s VALUES (\"%s\",\"%s\",\"%s\",\"%s\",\"%s\",%s)"
+		na = (CourseID, ChallengeID, Type, target, timeout, issuedTimestamp,"TRUE")
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		return ChallengeID
 
+	# get latest challenge id
+	# return latest challenge id
+	# return 0 if no challenge exist
+	# return -1 if no such Courseid
+	def latestChallengeID(self, CourseID):
+		sql = "show tables like \"Challenge_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "select max(ChallengeID) from Challenge_%s"#+"where isActive=1"
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return 0
+		return result[0][0]
 
+	# get current active challenges
+	# return list(tuple(challengeID, timeout, issuedTimestamp))
+	# return 0 if no active challenge
+	# return -1 if no such courseid 
+	def getActiveChallenges(self, CourseID):
+		sql = "show tables like \"Challenge_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "select ChallengeID, timeout, issuedTimestamp from Challenge_%s where isActive=1"
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return 0
+		return result
 
+	# update challenge active condition
+	# return true if success
+	# return -1 if no such courseid 
+	def setActive(self, CourseID, ChallengeID, active):
+		sql = "show tables like \"Challenge_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "update Challenge_%s set isActive=%s where ChallengeID=\"%s\""
+		stractive="False"
+		if active==True:
+			stractive="TRUE"
+		na = (CourseID, stractive, ChallengeID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		return True
 
+	# get student id via student's random token
+	# return student id if success
+	# return 0 if no random token
+	# return -1 if no such courseid
+	def getStuID(self, CourseID, StudentToken):
+		sql = "show tables like \"Stu_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "select StuID from Stu_%s where Random_Token=\"%s\""
+		na = (CourseID, StudentToken, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return 0
+		return "".join(list(result[0]))
 
+	# get challenges which should be anwser by the student
+	# return list(tuple(challengeID,type,timeout))
+	# return 0 if no active challenge
+	# return -1 if no such courseid
+	def getStudentChallenges(self, CourseID, StuID):
+		sql = "show tables like \"Attendance_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "select ChallengeID from Attendance_%s where StuID=\"%s\""
+		na = (CourseID, StuID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return 0
+		# print(result)
+		challengeids=[]
+		for x in result:
+			challengeids.append(x[0])
+		# print(challengeids)
+		returnlist=[]
+		for id in challengeids:
+			sql = "select ChallengeID, type, timeout from Challenge_%s where ChallengeID=\"%s\""
+			na = (CourseID, id, )
+			sql = sql % na
+			self.cursor.execute(sql)
+			result=self.cursor.fetchall()
+			returnlist.append(result)
+		return returnlist
 
-
-
-
-
-
-
+	# update attendance talbe
+	# return True if success
+	# return -1 if no such courseid
+	def setStudentAttendance(self, CourseID, ChallengeID, StuID, timestamp, Success):
+		sql = "show tables like \"Attendance_%s\""
+		na = (CourseID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		result=self.cursor.fetchall()
+		if len(result)==0:
+			return -1
+		sql = "update Attendance_%s set Call_Time=\"%s\", Success=%s where StuID=\"%s\" "\
+			+"and ChallengeID=\"%s\""
+		strsuccess="False"
+		if Success==True:
+			strsuccess="TRUE"
+		na = (CourseID, timestamp, strsuccess, StuID, ChallengeID, )
+		sql = sql % na
+		self.cursor.execute(sql)
+		self.ServerDB.commit()
+		return True
 
 
 
