@@ -5,9 +5,10 @@
     <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
-    <form name="challengeForm" action="/acceptChallenge" method = "post">
+    <form id="challengeForm" name="challengeForm" action="/acceptChallenge" method = "post">
         <input type="hidden" id="courseID" name="courseID" value=""><br>
         <input type="hidden" id="studentToken" name="studentToken" value=""><br>
+        <input type="hidden" id="challengeID" name="challengeID" value=""><br>
         <div class="g-recaptcha" data-sitekey="6Le-piobAAAAAJXR_vaBmeCbQtdOaMmk0k42IVnS"></div><br />
         <input type="submit" value="Submit">
     </form><br>
