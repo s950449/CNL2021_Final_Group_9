@@ -7,7 +7,7 @@ import requests
 import configparser
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime,timedelta
 from werkzeug.wrappers import response
 from mail import mail
 from DB.DB import DB
@@ -65,11 +65,26 @@ class server:
                 response = jsonify(hasChallenge = 0)
                 response.headers.add('Access-Control-Allow-Origin', '*')
                 return response 
-            challengeID,timeout,timestamp = result          
+            for ids,timeouts,timestamps in result:
+                if (timestamps + timedelta(seconds=timeouts)) > datetime.now():
+                    self.connectDB()
+                    status = self.db.setActive(courseID,ids,False)
+                    self.closeDB()
+            self.connectDB()
+            result = self.db.getStudentChallenges(courseID,self.db.getStuID(courseID,studentToken))
+            self.closeDB()
+            challengeID,challengeType,timeout,timestamp =result 
+            hasChallenge = 1
+            if result == 0:
+                hasChallenge = 0
+                challengeID = ""
+                challengeType = ""
+                timeout = 0
+                timestamp = ""
             response = jsonify(
-                hasChallenge = 1,
+                hasChallenge = hasChallenge,
                 challengeID = challengeID,
-                type = 0,
+                type = challengeType,
                 timeout =  timeout,
                 timestamp = timestamp
             )
