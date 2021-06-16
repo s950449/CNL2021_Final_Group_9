@@ -3,6 +3,7 @@ let CourseID = 'default course token';
 let CourseName = 'default course name';
 let UserToken = 'default user token';
 let UserName = 'default user name';
+let ChallengeID = 'challengeID';
 let InClass = 0;
 const checkChallengeInterval = 10000;
 
@@ -97,8 +98,8 @@ function checkChallenge() {
             onConnectionLost();
         else
             response.json().then(data => {
-                if ('hasChallenge' in data && data.hasChallenge === 1 && 'type' in data && 'timeout' in data)
-                    challenge(data.type, data.timeout);
+                if ('hasChallenge' in data && data.hasChallenge === 1 && 'type' in data && 'timeout' in data && 'challengeID' in data)
+                    challenge(data.type, data.timeout, data.challengeID);
             });
     })
     .catch((error) => {
@@ -131,13 +132,15 @@ function getName() {
     })
 }
 
-function challenge(type, timeout) {
+function challenge(type, timeout, challengeID) {
     console.log('type: ', type, 'timeout: ', timeout);
     const url = protocol + ServerAddress + "/acceptChallenge";
     chrome.windows.create({url: url, type: 'popup', width:500, height:250}, function(newWindow) {
-        chrome.tabs.executeScript(newWindow.tabs[0].id, { file: "./js/challenge.js" })
-        setTimeout(function(){
-            chrome.windows.remove(newWindow.id);
-        }, timeout*1000);
+        chrome.storage.local.set({ 'ChallengeID':challengeID }, function() {
+            chrome.tabs.executeScript(newWindow.tabs[0].id, { file: "./js/challenge.js" })
+            setTimeout(function(){
+                chrome.windows.remove(newWindow.id);
+            }, timeout*1000);
+        });
     });
 }
